@@ -1,13 +1,16 @@
 package com.mesrurkirbas.storingdata;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -35,12 +38,30 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void save(View view){
-        if (!editText.getText().toString().matches("")){
-            int userAge = Integer.parseInt(editText.getText().toString());
-            textView.setText("your age: " + userAge );
 
-            sharedpreferences.edit().putInt("storedAge",userAge).apply();
-        }
+        AlertDialog.Builder alert =new AlertDialog.Builder(this);
+        alert.setTitle("Save");
+        alert.setMessage("Are you sure?");
+        alert.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (!editText.getText().toString().matches("")){
+                    int userAge = Integer.parseInt(editText.getText().toString());
+                    textView.setText("your age: " + userAge );
+
+                    sharedpreferences.edit().putInt("storedAge",userAge).apply();
+                }
+                Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_LONG).show();
+            }
+        });
+        alert.setNegativeButton("no", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(MainActivity.this,"Not saved",Toast.LENGTH_LONG).show();
+            }
+        });
+
+        alert.show();
     }
 
     public void delete(View view){
