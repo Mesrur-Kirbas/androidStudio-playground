@@ -2,6 +2,7 @@ package com.mesrurkirbas.storingdata;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -45,13 +46,21 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton("yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (!editText.getText().toString().matches("")){
-                    int userAge = Integer.parseInt(editText.getText().toString());
-                    textView.setText("your age: " + userAge );
+                String ageText = editText.getText().toString();
+                if (!ageText.isEmpty()) {
+                    int userAge = Integer.parseInt(ageText);
 
+                    textView.setText("your age: " + userAge );
                     sharedpreferences.edit().putInt("storedAge",userAge).apply();
+
+                    Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                    intent.putExtra("age", userAge);
+                    startActivity(intent);
+
+                    Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Please enter an age!", Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_LONG).show();
             }
         });
         alert.setNegativeButton("no", new DialogInterface.OnClickListener() {
@@ -71,6 +80,5 @@ public class MainActivity extends AppCompatActivity {
             textView.setText("Your age: ");
         }
     }
-
 
 }
