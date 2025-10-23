@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,6 +22,10 @@ public class MainActivity extends AppCompatActivity {
     EditText editText;
     TextView textView;
     SharedPreferences sharedpreferences;
+    CountDownTimer countDownTimer;
+    TextView textView4;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,18 +34,32 @@ public class MainActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.editTextNumber);
         textView = findViewById(R.id.textView);
+        textView4 = findViewById(R.id.textView4);
 
         sharedpreferences = this.getSharedPreferences("com.mesrurkirbas.storingdata", Context.MODE_PRIVATE);
         int storedAge = sharedpreferences.getInt("storedAge", 0);
         textView.setText("Your age =" + storedAge);
+
+        new CountDownTimer(10000, 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                textView4.setText("Left: " + millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_LONG).show();
+                textView4.setText("Finished!");
+            }
+
+        }.start();
     }
 
 
+    public void save(View view) {
 
-
-    public void save(View view){
-
-        AlertDialog.Builder alert =new AlertDialog.Builder(this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Save");
         alert.setMessage("Are you sure?");
         alert.setPositiveButton("yes", new DialogInterface.OnClickListener() {
@@ -50,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
                 if (!ageText.isEmpty()) {
                     int userAge = Integer.parseInt(ageText);
 
-                    textView.setText("your age: " + userAge );
-                    sharedpreferences.edit().putInt("storedAge",userAge).apply();
+                    textView.setText("your age: " + userAge);
+                    sharedpreferences.edit().putInt("storedAge", userAge).apply();
 
                     Intent intent = new Intent(MainActivity.this, Main2Activity.class);
                     intent.putExtra("age", userAge);
@@ -66,16 +85,16 @@ public class MainActivity extends AppCompatActivity {
         alert.setNegativeButton("no", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(MainActivity.this,"Not saved",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Not saved", Toast.LENGTH_LONG).show();
             }
         });
 
         alert.show();
     }
 
-    public void delete(View view){
-        int storedData =  sharedpreferences.getInt("storedAge", 0);
-        if (storedData != 0){
+    public void delete(View view) {
+        int storedData = sharedpreferences.getInt("storedAge", 0);
+        if (storedData != 0) {
             sharedpreferences.edit().remove("storedAge").apply();
             textView.setText("Your age: ");
         }
