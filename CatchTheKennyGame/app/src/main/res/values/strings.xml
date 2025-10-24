@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CatchTheKennyGame</string>
+    <string name="score_text">Score: %d</string>
+</resources>
