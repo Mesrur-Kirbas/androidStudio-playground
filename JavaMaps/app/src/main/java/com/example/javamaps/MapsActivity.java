@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -37,6 +38,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationManager locationManager;
     LocationListener locationListener;
 
+    SharedPreferences sharedPreferences;
+
+    boolean info;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,17 +55,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         registerLauncher();
-    }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+        sharedPreferences = this.getSharedPreferences("com.example.javamaps",MODE_PRIVATE);
+        info = false;
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -70,8 +68,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          locationListener = new LocationListener() {        // LocationManagerdan konumiun degistiginin bilgisini alabilmek icin kullandigimiz bir arayuzdur.
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                System.out.println("location:" + location.toString());
-            }
+                //System.out.println("location:" + location.toString());
+
+                info =  sharedPreferences.getBoolean("info",false);
+
+                if (!info){    // !info means info == false
+                    LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15));
+                    sharedPreferences.edit().putBoolean("info",true).apply();
+                }
+                }
+
         };
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
@@ -91,15 +98,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }else {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+
+            Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);              //Son Bilinen konum alinir.
+            if (lastLocation != null){
+                LatLng lastUserLocation = new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,15));
+            }
+
+            mMap.setMyLocationEnabled(true);
         }
-        
 
-
-
-
-        LatLng eiffel = new LatLng(48.8559713,2.2930037);                // LatLng enlem ve boylam tutar
-        mMap.addMarker(new MarkerOptions().position(eiffel).title("Eiffel Tower"));     // marker ekleme
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eiffel,15));          // acilista kamera zoomlama
+        //LatLng eiffel = new LatLng(48.8559713,2.2930037);                // LatLng enlem ve boylam tutar
+        //mMap.addMarker(new MarkerOptions().position(eiffel).title("Eiffel Tower"));     // marker ekleme
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eiffel,15));          // acilista kamera zoomlama
     }
 
     private void registerLauncher(){
@@ -108,16 +119,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onActivityResult(Boolean o) {
                 if (o) {
                     //permission granted
-                    if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+                    if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
+
+                        Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);              //Son Bilinen konum alinir.
+                        if (lastLocation != null) {
+                            LatLng lastUserLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation, 15));                // daha onceden kayitli bir konum var ise konum izni alinir alinmaz oncelikle mapsde o konumu gosterir sonrasinda mevcut konumu alarak o konuma ayarlama yapilir.
+                        }
+
+
+                    } else {
+                        //permission denied
+                        Toast.makeText(MapsActivity.this, "Permisson needed!", Toast.LENGTH_LONG).show();
                     }
-
-
-
-                } else {
-                    //permission denied
-                    Toast.makeText(MapsActivity.this, "Permisson needed!", Toast.LENGTH_LONG).show();
                 }
             }
         });
