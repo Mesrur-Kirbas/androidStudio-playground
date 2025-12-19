@@ -28,7 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.javamaps.databinding.ActivityMapsBinding;
 import com.google.android.material.snackbar.Snackbar;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -62,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapLongClickListener(this);
 
         // BU BOLUMDE CASTING ISLEMI YAPIYORUZ
          locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);  // SiSTEMIN KONUM SERVISLERINE ERISMNI SAGLAR
@@ -137,5 +138,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+    }
+
+    @Override
+    public void onMapLongClick(@NonNull LatLng latLng) {
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(latLng));
+
     }
 }
