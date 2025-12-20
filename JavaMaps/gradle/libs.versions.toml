@@ -9,6 +9,10 @@ activity = "1.11.0"
 constraintlayout = "2.2.1"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
 playServicesMaps = "18.1.0"
+recyclerview = "1.4.0"
+roomRxjava3 = "2.8.4"
+rxandroid = "3.0.2"
+room = "2.8.4"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -19,6 +23,13 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room" }
+rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxandroid" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
