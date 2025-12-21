@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JavaMaps">
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,7 +37,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAig7Knfhz34vI-QC31FRa3MBSR5DJxxp8" />
         <activity
-            android:name=".MapsActivity"
+            android:name=".view.MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps">
 

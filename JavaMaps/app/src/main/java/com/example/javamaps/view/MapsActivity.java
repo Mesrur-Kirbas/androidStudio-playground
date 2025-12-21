@@ -1,4 +1,4 @@
-package com.example.javamaps;
+package com.example.javamaps.view;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.room.Room;
 
 import android.Manifest;
 import android.content.Context;
@@ -19,6 +20,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.javamaps.R;
+import com.example.javamaps.model.Place;
+import com.example.javamaps.room.db.PlaceDao;
+import com.example.javamaps.room.db.PlaceDatabase;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,15 +37,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-
     ActivityResultLauncher<String> permissionLauncher;
-
     LocationManager locationManager;
     LocationListener locationListener;
-
     SharedPreferences sharedPreferences;
-
+    PlaceDatabase db;
+    PlaceDao placeDao;
     boolean info;
+    Double selectedLatitude;
+    Double getSelectedLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +63,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         sharedPreferences = this.getSharedPreferences("com.example.javamaps",MODE_PRIVATE);
         info = false;
+        db = Room.databaseBuilder(getApplicationContext(),PlaceDatabase.class,"Places").build();
+        placeDao = db.placeDao();
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapLongClickListener(this);
+
+        binding.saveButton.setEnabled(false);
 
         // BU BOLUMDE CASTING ISLEMI YAPIYORUZ
          locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);  // SiSTEMIN KONUM SERVISLERINE ERISMNI SAGLAR
@@ -144,6 +153,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapLongClick(@NonNull LatLng latLng) {
         mMap.clear();
         mMap.addMarker(new MarkerOptions().position(latLng));
+
+        selectedLatitude = latLng.latitude;
+        getSelectedLongitude = latLng.longitude;
+
+        binding.saveButton.setEnabled(true);
+    }
+
+    public void save(View view){
+
+        Place place = new Place(binding.placeNameText.getText().toString(),selectedLatitude,getSelectedLongitude);
+        placeDao.insert(place);
+
+    }
+
+    public void delete(View view){
 
     }
 }
