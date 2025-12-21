@@ -52,6 +52,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Double selectedLatitude;
     Double getSelectedLongitude;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    Place selectedPlace;
+
 
 
     @Override
@@ -75,62 +77,91 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //uygulamamız çöker bu yüzden yukarıdaki kodumuzu .allowMainThreadQueries.build() ile değiştirirsek uygulamamız çalışır
         //ANCAK bu amatör bir yöntemdir ve önerilmez.!!!
         placeDao = db.placeDao();
+
+
+        selectedLatitude = 0.0;
+        getSelectedLongitude = 0.0;
+
+        binding.saveButton.setEnabled(false);
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapLongClickListener(this);
 
-        binding.saveButton.setEnabled(false);
+        Intent intent = getIntent();
+        String intentinfo = intent.getStringExtra("info");
 
-        // BU BOLUMDE CASTING ISLEMI YAPIYORUZ
-         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);  // SiSTEMIN KONUM SERVISLERINE ERISMNI SAGLAR
-         locationListener = new LocationListener() {        // LocationManagerdan konumiun degistiginin bilgisini alabilmek icin kullandigimiz bir arayuzdur.
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                //System.out.println("location:" + location.toString());
+        if (intentinfo.equals("new")){
 
-                info =  sharedPreferences.getBoolean("info",false);
+            binding.saveButton.setVisibility(View.VISIBLE);
+            binding.deleteButton.setVisibility(View.GONE);
 
-                if (!info){    // !info means info == false
-                    LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15));
-                    sharedPreferences.edit().putBoolean("info",true).apply();
-                }
-                }
 
-        };
+            // BU BOLUMDE CASTING ISLEMI YAPIYORUZ
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);  // SiSTEMIN KONUM SERVISLERINE ERISMNI SAGLAR
+            locationListener = new LocationListener() {        // LocationManagerdan konumiun degistiginin bilgisini alabilmek icin kullandigimiz bir arayuzdur.
+                @Override
+                public void onLocationChanged(@NonNull Location location) {
+                    //System.out.println("location:" + location.toString());
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                    info =  sharedPreferences.getBoolean("info",false);
 
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
-                Snackbar.make(binding.getRoot(),"Permission needed",Snackbar.LENGTH_INDEFINITE).setAction("Give Permission", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //request permission
-                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                    if (!info){    // !info means info == false
+                        LatLng userLocation = new LatLng(location.getLatitude(),location.getLongitude());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,15));
+                        sharedPreferences.edit().putBoolean("info",true).apply();
                     }
-                }).show();
+                }
+
+            };
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+                    Snackbar.make(binding.getRoot(),"Permission needed",Snackbar.LENGTH_INDEFINITE).setAction("Give Permission", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //request permission
+                            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                        }
+                    }).show();
+                }else {
+                    //request permission
+                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+
+                }
             }else {
-                //request permission
-                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
 
+                Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);              //Son Bilinen konum alinir.
+                if (lastLocation != null){
+                    LatLng lastUserLocation = new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,15));
+                }
+
+                mMap.setMyLocationEnabled(true);
             }
+
+            //LatLng eiffel = new LatLng(48.8559713,2.2930037);                // LatLng enlem ve boylam tutar
+            //mMap.addMarker(new MarkerOptions().position(eiffel).title("Eiffel Tower"));     // marker ekleme
+            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eiffel,15));          // acilista kamera zoomlama
         }else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
 
-            Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);              //Son Bilinen konum alinir.
-            if (lastLocation != null){
-                LatLng lastUserLocation = new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,15));
-            }
+            mMap.clear();
 
-            mMap.setMyLocationEnabled(true);
+             selectedPlace = (Place) intent.getSerializableExtra("Place");
+
+             LatLng latLng = new LatLng(selectedPlace.latitude,selectedPlace.longitude);
+
+             mMap.addMarker(new MarkerOptions().position(latLng).title(selectedPlace.name));
+             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
+             binding.placeNameText.setText(selectedPlace.name);
+             binding.saveButton.setVisibility(View.GONE);
+             binding.deleteButton.setVisibility(View.VISIBLE);
+
         }
-
-        //LatLng eiffel = new LatLng(48.8559713,2.2930037);                // LatLng enlem ve boylam tutar
-        //mMap.addMarker(new MarkerOptions().position(eiffel).title("Eiffel Tower"));     // marker ekleme
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eiffel,15));          // acilista kamera zoomlama
     }
 
     private void registerLauncher(){
@@ -197,13 +228,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void delete(View view){
-        /*
-        compositeDisposable.add(placeDao.delete()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(MapsActivity.this::handleResponse)
-        );  */
-    }
+
+        if (selectedPlace != null){
+            compositeDisposable.add(placeDao.delete(selectedPlace)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(MapsActivity.this::handleResponse)
+            );
+        }
+
+        }
+
 
     @Override
     protected void onDestroy() {

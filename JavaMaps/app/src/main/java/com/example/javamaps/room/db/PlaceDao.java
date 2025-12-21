@@ -15,7 +15,7 @@ import io.reactivex.rxjava3.core.Flowable;
 @Dao
 public interface PlaceDao {
     @Query("SELECT * FROM Place")
-    Flowable<Place> getAll();
+    Flowable<List<Place>> getAll();
     @Insert
     Completable insert(Place place);
     @Delete
