@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "3573946226",
+    "project_id": "javainstaclone-6b981",
+    "storage_bucket": "javainstaclone-6b981.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:3573946226:android:9f920759de7d58468b2feb",
+        "android_client_info": {
+          "package_name": "com.example.javainstagramclone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANwnsjhKauaFx8LZtAjs4Lb_mTjIXIhY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
