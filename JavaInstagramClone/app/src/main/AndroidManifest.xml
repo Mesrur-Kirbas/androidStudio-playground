@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JavaInstagramClone">
         <activity
+            android:name=".UploadActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FeedActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
