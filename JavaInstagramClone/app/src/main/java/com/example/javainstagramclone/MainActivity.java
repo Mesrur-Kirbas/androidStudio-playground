@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
-        FirebaseUser user = auth.getCurrentUser();             // KULLANICI ZATEN GIRIS YAPTIYSA TEKRAR PARALO ISTEMEZ
+        FirebaseUser user = auth.getCurrentUser();             // KULLANICI ZATEN GIRIS YAPTIYSA TEKRAR PAROLO ISTEMEZ
         if (user != null){
             Intent intent = new Intent(MainActivity.this,FeedActivity.class);
             startActivity(intent);
