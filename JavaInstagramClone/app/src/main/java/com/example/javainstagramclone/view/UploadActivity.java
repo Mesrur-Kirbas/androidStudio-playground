@@ -1,4 +1,4 @@
-package com.example.javainstagramclone;
+package com.example.javainstagramclone.view;
 
 import android.Manifest;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,9 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.javainstagramclone.databinding.ActivityUploadBinding;
 import com.google.android.gms.tasks.OnFailureListener;
